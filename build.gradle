@@ -1,1 +1,9 @@
 apply plugin: "java"
+
+sourceSets{
+	main.java.srcDir "src"
+}
+
+jar{
+	manifest.attributes "Main-Class": "some.thing.Helloworld"
+}
