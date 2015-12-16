@@ -1,9 +1,68 @@
-apply plugin: "java"
+repositories{
+	mavenCentral()
+}
+
+apply plugin: 'java'
+
+configurations{
+	myConfig
+}
+
+dependencies{
+	compile 'org.apache.commons:commons-lang3:3.4'
+	myConfig 'org.apache.commons:commons-lang3:3.4'
+}
 
 sourceSets{
-	main.java.srcDir "src"
+	main.java.srcDir 'src'
 }
 
 jar{
-	manifest.attributes "Main-Class": "some.thing.Helloworld"
+	from configurations.myConfig.collect { zipTree it}
+	manifest.attributes 'Main-Class': 'some.thing.Helloworld'
 }
+
+task run(type: JavaExec, dependsOn: classes){
+	main 'some.thing.Helloworld'
+	classpath sourceSets.main.runtimeClasspath
+	args 'Hello WorLd'
+	
+}
+
+task runJar(type: Exec, dependsOn: jar){
+	executable 'java'
+	args '-jar', "$jar.archivePath", 'Hello World'
+}
+
+task writeGreeting{
+//	onlyIf {!file('greeting.txt').text.equals('Hello, fellow citizen!')}
+	outputs.file file('greeting.txt')
+}<<{
+	file('greeting.txt').text = 'Hello, fellow citizen!'
+}
+
+task secondTask{
+	onlyIf{true}
+	println 'Hello from the configuration phase of secondTask!'
+}<<{
+	println 'Hello!'
+}
+
+secondTask.enabled = false
+
+
+task hello {
+	group 'greeting'
+	description 'Greets you.'
+	
+	//configuration phase
+	println 'Hello from the configuration phase of hello!'
+	ext.greeting = 'Hey, how\'s it going ?'
+	
+	//execution phase
+	doLast{	println 'Hello!'}
+	doFirst{ println 'Hey, I know thig guy' }
+	doLast{ println "Greeting : $greeting" }
+}
+
+hello<<{println 'whats cracking ?'}
