@@ -9,8 +9,6 @@ public class ElucidateProcessor {
 			ElucidateReader elucidateReader = new ElucidateReader();
 			BufferedReader br = elucidateReader.read(string);
 
-			ElucidateWrite elucidateWrite = new ElucidateWrite();
-			elucidateWrite.write(string, br);
 		}
 	}
 
