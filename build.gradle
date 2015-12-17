@@ -23,7 +23,15 @@ sourceSets{
 
 jar{
 	from configurations.myConfig.collect { zipTree it}
-	manifest.attributes 'Main-Class': 'some.thing.Helloworld'
+	//manifest.attributes 'Main-Class': 'some.thing.Helloworld'
+	manifest.attributes 'Main-Class': 'html.data.processing.Elucidate'
+}
+
+war{
+    //webInf { from 'WebContent' } // adds a file-set to the WEB-INF dir.
+ //   classpath fileTree('WebContent/WEB-INF/lib') // adds a file-set to the WEB-INF/lib dir.
+    //classpath configurations.moreLibs // adds a configuration to the WEB-INF/lib dir.
+    //webXml = file('WebContent/WEB-INF/web.xml') // copies a file to WEB-INF/web.xml
 }
 
 task run(type: JavaExec, dependsOn: classes){

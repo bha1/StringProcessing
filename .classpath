@@ -15,5 +15,6 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="D:/workspace/jar-depot/commons-lang3-3.4.jar"/>
 	<classpathentry kind="lib" path="D:/workspace/sqlite-jdbc-3.8.11.2.jar"/>
+	<classpathentry kind="lib" path="D:/workspace/property"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
