@@ -6,16 +6,33 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import some.thing.RegexFriend;
 
-public class ElucidateReader {
+public class ElucidateReader extends Thread {
+	List<File> readFiles;
+	String tableName;
+
+	ElucidateReader(List<File> inputFiles, String tableName) {
+		this.readFiles = inputFiles;
+		this.tableName = tableName;
+		this.start();
+	}
+
+	public void run() {
+		for (Iterator iterator = readFiles.iterator(); iterator.hasNext();) {
+			File file = (File) iterator.next();
+			readTable(file, tableName);
+		}
+	}
 
 	public void readTable(File file, String tableName) {
-		System.out.println(file.getName());
-		Pattern regexTableName = Pattern.compile(tableName);
+		// System.out.println(file.getName());
+		Pattern regexTableName = Pattern.compile("(" + tableName + ")(?!</a>)");
 		Matcher matcherTableName = regexTableName.matcher("");
 
 		Pattern regexp_table_start = Pattern.compile("<table");
@@ -35,18 +52,20 @@ public class ElucidateReader {
 			while ((line = lineReader.readLine()) != null) {
 				matcherTableName.reset(line);
 				if (matcherTableName.find()) {
-					System.out.println("found table");
+					// System.out.println("found table");
 					table_found = true;
 					while ((line = lineReader.readLine()) != null) {
 						matcher_table_start.reset(line);
 						if (matcher_table_start.find()) {
-							System.out.println("table start" + lineReader.getLineNumber());
+							// System.out.println("table start" +
+							// lineReader.getLineNumber());
 							startTable = lineReader.getLineNumber();
 							table_start = true;
 							while ((line = lineReader.readLine()) != null) {
 								matcher_table_end.reset(line);
 								if (matcher_table_end.find()) {
-									System.out.println("table end" + lineReader.getLineNumber());
+									// System.out.println("table end" +
+									// lineReader.getLineNumber());
 									endTable = lineReader.getLineNumber();
 									table_end = true;
 									break;
@@ -74,21 +93,19 @@ public class ElucidateReader {
 
 	private void readRow(File file, String tableName, int startTable, int endTable) {
 		int lineNumber = startTable;
-		String destFileName = "/D:/workspace/NBE/processed" + tableName.replace(" ", "_") + ".csv";
+		String destFileName = "/D:/workspace/NBE/processed/" + tableName.replace(" ", "_") + ".csv";
 		File processedFile = new File(destFileName);
 		boolean bool;
 		BufferedReader reader;
 		RegexFriend regfrnd = new RegexFriend();
 		try {
-			if (!processedFile.exists()) {
-				bool = processedFile.createNewFile();
-			}
 			reader = new BufferedReader(new FileReader(file));
 			LineNumberReader lineReader = new LineNumberReader(reader);
 			String line = null;
 			while ((line = lineReader.readLine()) != null) {
 				if (lineReader.getLineNumber() >= startTable && lineReader.getLineNumber() <= endTable) {
 					if (!processedFile.exists()) {
+						bool = processedFile.createNewFile();
 						regfrnd.printPatternHeader(line, file, processedFile);
 					} else {
 

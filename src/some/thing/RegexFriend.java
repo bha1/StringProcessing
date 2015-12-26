@@ -16,6 +16,7 @@ public class RegexFriend {
 		Matcher matcher_tr = pattern_tr.matcher(str);
 		Pattern pattern_th = Pattern.compile("<th(.*?)>(.*?)</th>");
 		Matcher matcher_th;
+		boolean row_written = false;
 		String str_tr;
 		while (matcher_tr.find()) {
 			// System.out.println("start index" + matcher_tr.start());
@@ -27,19 +28,24 @@ public class RegexFriend {
 				// System.out.println("***********************************");
 				// System.out.println("start index" + matcher_th.start());
 				// System.out.println("end index" + matcher_th.end());
-				System.out.print(matcher_th.group(2) + ",");
+				// System.out.print(unicodeAndQuotesProcessor(matcher_th.group(2))
+				// + ",");
 				try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(processedFile, true)))) {
-					out.print(matcher_th.group(2) + ",");
+					out.print(unicodeAndQuotesProcessor(matcher_th.group(2)) + ",");
+					row_written = true;
 				} catch (IOException e) {
 					// exception handling left as an exercise for the reader
 				}
 			}
-			System.out.println("***********************************");
+			// System.out.println("***********************************");
 		}
-		try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(processedFile, true)))) {
-			out.println(file.getName());
-		} catch (IOException e) {
-			// exception handling left as an exercise for the reader
+		if (row_written) {
+			try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(processedFile, true)))) {
+				out.println("File Name");
+				row_written = false;
+			} catch (IOException e) {
+				// exception handling left as an exercise for the reader
+			}
 		}
 
 	}
@@ -50,6 +56,7 @@ public class RegexFriend {
 		Matcher matcher_tr = pattern_tr.matcher(str);
 		Pattern pattern_td = Pattern.compile("<td(.*?)>(.*?)</td>");
 		Matcher matcher_td;
+		boolean row_written = false;
 		String str_tr;
 		while (matcher_tr.find()) {
 			// System.out.println("start index" + matcher_tr.start());
@@ -61,21 +68,35 @@ public class RegexFriend {
 				// System.out.println("***********************************");
 				// System.out.println("start index" + matcher_th.start());
 				// System.out.println("end index" + matcher_th.end());
-				System.out.print(matcher_td.group(2) + ",");
+				// System.out.print(unicodeAndQuotesProcessor(matcher_td.group(2))
+				// + ",");
 				try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(processedFile, true)))) {
-					out.print(matcher_td.group(2) + ",");
+					out.print(unicodeAndQuotesProcessor(matcher_td.group(2)) + ",");
+					row_written = true;
 				} catch (IOException e) {
 					// exception handling left as an exercise for the reader
 				}
 			}
-			try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(processedFile, true)))) {
-				out.println(file.getName());
-			} catch (IOException e) {
-				// exception handling left as an exercise for the reader
+			if (row_written) {
+				try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(processedFile, true)))) {
+					out.println(file.getName());
+					row_written = false;
+				} catch (IOException e) {
+					// exception handling left as an exercise for the reader
+				}
 			}
-
 		}
 
+	}
+
+	private String unicodeAndQuotesProcessor(String arg) {
+		String product = arg;
+		if (arg.equals("&#160;")) {
+			arg = "";
+		}
+		product = ("\"" + arg + "\"");
+
+		return product;
 	}
 
 	public static void main(String[] args) {
