@@ -27,37 +27,42 @@ public class ElucidateProcessor {
 		tableNames.add("Segments by UnOptimized Reads");
 		tableNames.add("Segments by Logical Reads");
 		String tableName;
-		ElucidateReader elucidateReader[] = new ElucidateReader[tableNames.size()];
-		for (Iterator iterator = tableNames.iterator(); iterator.hasNext();) {
-			tableName = (String) iterator.next();
-			for (int i = 0; i < tableNames.size(); i++)
-				elucidateReader[i] = new ElucidateReader(inputFiles, tableName);
-		}
 
-		for (int i = 0; i < elucidateReader.length; i++)
-			try {
-				elucidateReader[i].join();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} finally {
-				System.out.println("Time Required : " + (System.currentTimeMillis() - tim) + " miliseconds.");
-			}
-		// for (Iterator iterator = inputFiles.iterator(); iterator.hasNext();)
+		// ElucidateReader elucidateReader[] = new
+		// ElucidateReader[tableNames.size()];
+		// for (Iterator iterator = tableNames.iterator(); iterator.hasNext();)
 		// {
-		// File file = (File) iterator.next();
-		//
-		// // elucidateReader.readTable(file, "Background Wait Events");
-		// elucidateReader.readTable(file, "Top 5 Timed Foreground Events");
-		// elucidateReader.readTable(file, "Top Foreground Wait Class");
-		// elucidateReader.readTable(file, "Segments by Buffer Busy Waits");
-		// elucidateReader.readTable(file, "Segments by Row Lock Waits");
-		// elucidateReader.readTable(file, "Segments by ITL Waits");
-		// elucidateReader.readTable(file, "Segments by Physical Reads");
-		// elucidateReader.readTable(file, "Segments by UnOptimized Reads");
-		// elucidateReader.readTable(file, "Segments by Logical Reads");
-		//
+		// tableName = (String) iterator.next();
+		// for (int i = 0; i < tableNames.size(); i++)
+		// elucidateReader[i] = new ElucidateReader(inputFiles, tableName);
 		// }
+		//
+		// for (int i = 0; i < elucidateReader.length; i++)
+		// try {
+		// elucidateReader[i].join();
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// } finally {
+		// System.out.println("Time Required : " + (System.currentTimeMillis() -
+		// tim) + " miliseconds.");
+		// }
+
+		for (Iterator iterator = inputFiles.iterator(); iterator.hasNext();) {
+			File file = (File) iterator.next();
+
+			// elucidateReader.readTable(file, "Background Wait Events");
+			ElucidateReader.readTable(file, "Top 5 Timed Foreground Events");
+			ElucidateReader.readTable(file, "Top Foreground Wait Class");
+			ElucidateReader.readTable(file, "Segments by Buffer Busy Waits");
+			ElucidateReader.readTable(file, "Segments by Row Lock Waits");
+			ElucidateReader.readTable(file, "Segments by ITL Waits");
+			ElucidateReader.readTable(file, "Segments by Physical Reads");
+			ElucidateReader.readTable(file, "Segments by UnOptimized Reads");
+			ElucidateReader.readTable(file, "Segments by Logical Reads");
+
+		}
+		System.out.println("Time Required : " + (System.currentTimeMillis() - tim) + " miliseconds.");
 
 	}
 

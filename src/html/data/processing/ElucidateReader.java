@@ -30,7 +30,7 @@ public class ElucidateReader extends Thread {
 		}
 	}
 
-	public void readTable(File file, String tableName) {
+	public static void readTable(File file, String tableName) {
 		// System.out.println(file.getName());
 		Pattern regexTableName = Pattern.compile("(" + tableName + ")(?!</a>)");
 		Matcher matcherTableName = regexTableName.matcher("");
@@ -91,7 +91,7 @@ public class ElucidateReader extends Thread {
 		}
 	}
 
-	private void readRow(File file, String tableName, int startTable, int endTable) {
+	public static void readRow(File file, String tableName, int startTable, int endTable) {
 		int lineNumber = startTable;
 		String destFileName = "/D:/workspace/NBE/processed/" + tableName.replace(" ", "_") + ".csv";
 		File processedFile = new File(destFileName);
