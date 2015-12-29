@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -24,9 +25,17 @@ public class ElucidateReader extends Thread {
 	}
 
 	public void run() {
-		for (Iterator iterator = readFiles.iterator(); iterator.hasNext();) {
+		// for (Iterator iterator = readFiles.iterator(); iterator.hasNext();) {
+		// File file = (File) iterator.next();
+		// readTable(file, tableName);
+		// }
+		readTableList(this.readFiles, this.tableName);
+	}
+
+	private void readTableList(List<File> list, String name) {
+		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
 			File file = (File) iterator.next();
-			readTable(file, tableName);
+			readTable(file, name);
 		}
 	}
 
@@ -93,12 +102,16 @@ public class ElucidateReader extends Thread {
 
 	public static void readRow(File file, String tableName, int startTable, int endTable) {
 		int lineNumber = startTable;
-		String destFileName = "/D:/workspace/NBE/processed/" + tableName.replace(" ", "_") + ".csv";
-		File processedFile = new File(destFileName);
 		boolean bool;
 		BufferedReader reader;
 		RegexFriend regfrnd = new RegexFriend();
 		try {
+			File fldr = new File(ElucidateReader.class.getProtectionDomain().getCodeSource().getLocation().toURI())
+					.getParentFile();
+			tableName = tableName.replace("/", "-");
+			String destFileName = "/processed/" + tableName.replace(" ", "_") + ".csv";
+			File processedFile = new File(fldr, destFileName);
+
 			reader = new BufferedReader(new FileReader(file));
 			LineNumberReader lineReader = new LineNumberReader(reader);
 			String line = null;
@@ -118,6 +131,9 @@ public class ElucidateReader extends Thread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

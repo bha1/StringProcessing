@@ -60,7 +60,18 @@ public class ElucidateProcessor {
 			ElucidateReader.readTable(file, "Segments by Physical Reads");
 			ElucidateReader.readTable(file, "Segments by UnOptimized Reads");
 			ElucidateReader.readTable(file, "Segments by Logical Reads");
-
+			ElucidateReader.readTable(file, "SQL ordered by Elapsed Time");
+			ElucidateReader.readTable(file, "SQL ordered by CPU Time");
+			ElucidateReader.readTable(file, "SQL ordered by User I/O Wait Time");
+			ElucidateReader.readTable(file, "SQL ordered by Gets");
+			ElucidateReader.readTable(file, "SQL ordered by Reads");
+			ElucidateReader.readTable(file, "SQL ordered by Physical Reads (UnOptimized)");
+			ElucidateReader.readTable(file, "SQL ordered by Executions");
+			ElucidateReader.readTable(file, "SQL ordered by Parse Calls");
+			ElucidateReader.readTable(file, "SQL ordered by Sharable Memory");
+			ElucidateReader.readTable(file, "SQL ordered by Version Count");
+			ElucidateReader.readTable(file, "SQL ordered by Cluster Wait Time");
+			ElucidateReader.readTable(file, "Complete List of SQL Text");
 		}
 		System.out.println("Time Required : " + (System.currentTimeMillis() - tim) + " miliseconds.");
 
