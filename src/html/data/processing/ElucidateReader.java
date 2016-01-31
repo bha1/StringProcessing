@@ -43,7 +43,8 @@ public class ElucidateReader extends Thread {
 		// System.out.println(file.getName());
 		Pattern regexTableName = Pattern.compile("(" + tableName + ")(?!</a>)");
 		Matcher matcherTableName = regexTableName.matcher("");
-
+		Pattern regexTableEmpty = Pattern.compile("(?i)(no)(.*)?(data)(.*)(exists)");
+		Matcher matcherTableEmpty = regexTableEmpty.matcher("");
 		Pattern regexp_table_start = Pattern.compile("<table");
 		Matcher matcher_table_start = regexp_table_start.matcher("");
 		Pattern regexp_table_end = Pattern.compile("</table");
@@ -64,6 +65,10 @@ public class ElucidateReader extends Thread {
 					// System.out.println("found table");
 					table_found = true;
 					while ((line = lineReader.readLine()) != null) {
+						matcherTableEmpty.reset(line);
+						if(matcherTableEmpty.find()){
+							break;
+						}
 						matcher_table_start.reset(line);
 						if (matcher_table_start.find()) {
 							// System.out.println("table start" +
