@@ -28,14 +28,15 @@ public class ReaderProcess {
 			tableNames = fetchTableNames();
 			Pattern patternTableName;
 			Matcher matcherTableName;
-			Pattern patternTableEmpty = Pattern.compile("(?i)(no)(.*)?(data)(.*)(exists)");
+			Pattern patternTableEmpty = Pattern
+					.compile("(?i)(no)(.*)?(data)(.*)(exists for this section of the report.)");
 			Matcher matcherTableEmpty = patternTableEmpty.matcher("");
 
 			Pattern patternTableStart = Pattern.compile("<table");
 			Matcher matcherTableStart = patternTableStart.matcher("");
 			Pattern patternTableEnd = Pattern.compile("</table");
 			Matcher matcherTableEnd = patternTableEnd.matcher("");
-			;
+
 			int startTable = 0, endTable = 0;
 			boolean tableHeadingFound = false, tableStart = false, tableEnd = false, tableIsEmpty = false;
 			for (String tableName : tableNames) {
@@ -45,34 +46,38 @@ public class ReaderProcess {
 				tableIsEmpty = false;
 				startTable = 0;
 				endTable = 0;
-				patternTableName = Pattern.compile(tableName);
+				patternTableName = Pattern.compile("(" + tableName + ")(?!</a>)");
 				matcherTableName = patternTableName.matcher("");
-				while ((line = lineNumberReader.readLine()) != null) {
+				lineNumberReader = new LineNumberReader(new BufferedReader(new FileReader(rawFile)));
+				while ((line = lineNumberReader.readLine()) != null && tableEnd != true && tableIsEmpty != true) {
 					matcherTableName.reset(line);
 					if (matcherTableName.find()) {
 						tableHeadingFound = true;
-						matcherTableEmpty.reset(line);
-						if (matcherTableEmpty.find()) {
-							tableIsEmpty = true;
-							break;
-						}
+
 						WriterProcess writerProcess = WriterProcess.getInstance();
 						writerProcess.createWriter(tableName);
-						while ((line = lineNumberReader.readLine()) != null) {
+						while ((line = lineNumberReader.readLine()) != null && tableEnd != true) {
+							matcherTableEmpty.reset(line);
+							if (matcherTableEmpty.find() && tableStart != true) {
+								tableIsEmpty = true;
+								writerProcess.closeWriter();
+								break;
+							}
 							matcherTableStart.reset(line);
 							if (matcherTableStart.find()) {
 								tableStart = true;
 								startTable = lineNumberReader.getLineNumber();
-								writerProcess.writeToFile(line);
+								writerProcess.writeToFile(line, rawFile);
 								while ((line = lineNumberReader.readLine()) != null) {
 									matcherTableEnd.reset(line);
 									if (matcherTableEnd.find()) {
 										tableEnd = true;
 										endTable = lineNumberReader.getLineNumber();
-										writerProcess.writeToFile(line);
+										writerProcess.writeToFile(line, rawFile);
+										writerProcess.closeWriter();
 										break;
 									}
-									writerProcess.writeToFile(line);
+									writerProcess.writeToFile(line, rawFile);
 								}
 							}
 						}
@@ -90,15 +95,15 @@ public class ReaderProcess {
 
 	private List<String> fetchTableNames() {
 		List<String> tableNames = new ArrayList<>();
-		tableNames.add("Background Wait Events");
-		tableNames.add("Top 5 Timed Foreground Events");
-		tableNames.add("Top Foreground Wait Class");
-		tableNames.add("Segments by Buffer Busy Waits");
-		tableNames.add("Segments by Row Lock Waits");
+		// tableNames.add("Background Wait Events");
+		// tableNames.add("Top 5 Timed Foreground Events");
+		// tableNames.add("Top Foreground Wait Class");
+		// tableNames.add("Segments by Buffer Busy Waits");
+		// tableNames.add("Segments by Row Lock Waits");
 		tableNames.add("Segments by ITL Waits");
-		tableNames.add("Segments by Physical Reads");
-		tableNames.add("Segments by UnOptimized Reads");
-		tableNames.add("Segments by Logical Reads");
+		// tableNames.add("Segments by Physical Reads");
+		// tableNames.add("Segments by UnOptimized Reads");
+		// tableNames.add("Segments by Logical Reads");
 
 		return tableNames;
 	}
