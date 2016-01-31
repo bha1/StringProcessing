@@ -1,0 +1,25 @@
+Background Wait Events
+Top 5 Timed Foreground Events
+Top Foreground Wait Class
+Segments by Buffer Busy Waits
+Segments by Row Lock Waits
+Segments by ITL Waits
+Segments by Physical Reads
+Segments by UnOptimized Reads
+Segments by Logical Reads
+SQL ordered by Elapsed Time
+SQL ordered by CPU Time
+SQL ordered by User I/O Wait Time
+SQL ordered by Gets
+SQL ordered by Reads
+SQL ordered by Physical Reads (UnOptimized)
+SQL ordered by Executions
+
+
+
+SQL ordered by Parse Calls
+SQL ordered by Sharable Memory
+SQL ordered by Version Count
+SQL ordered by Cluster Wait Time
+Complete List of SQL Text
+

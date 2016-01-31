@@ -41,4 +41,15 @@ public class FolderHelper {
 		// add throw for no files found
 		return listFile;
 	}
+
+	protected File configFile() {
+
+		File baseFolder = folderHelper.getFolder();
+		String destFileName = "tablelist.txt";
+		File configFile = new File(baseFolder, destFileName);
+		if (configFile.exists()) {
+			return configFile;
+		}
+		return null;
+	}
 }

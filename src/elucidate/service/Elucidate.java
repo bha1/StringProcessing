@@ -15,7 +15,7 @@ public class Elucidate {
 	}
 
 	public void processBegin() {
-		System.out.println("Inside process");
+
 		FolderHelper folderHelper = FolderHelper.getInstance();
 
 		List<File> rawList = new ArrayList<>();

@@ -94,17 +94,55 @@ public class ReaderProcess {
 	}
 
 	private List<String> fetchTableNames() {
+		FolderHelper folderHelper = FolderHelper.getInstance();
 		List<String> tableNames = new ArrayList<>();
-		// tableNames.add("Background Wait Events");
-		// tableNames.add("Top 5 Timed Foreground Events");
-		// tableNames.add("Top Foreground Wait Class");
-		// tableNames.add("Segments by Buffer Busy Waits");
-		// tableNames.add("Segments by Row Lock Waits");
-		tableNames.add("Segments by ITL Waits");
-		// tableNames.add("Segments by Physical Reads");
-		// tableNames.add("Segments by UnOptimized Reads");
-		// tableNames.add("Segments by Logical Reads");
+		File config = null;
+		Pattern emptyLine = Pattern.compile("[A-Za-z]");
+		Matcher matcherLine = emptyLine.matcher("");
+		if ((config = folderHelper.configFile()) == null) {
 
+			tableNames.add("Background Wait Events");
+			tableNames.add("Top 5 Timed Foreground Events");
+			tableNames.add("Top Foreground Wait Class");
+			tableNames.add("Segments by Buffer Busy Waits");
+			tableNames.add("Segments by Row Lock Waits");
+			tableNames.add("Segments by ITL Waits");
+			tableNames.add("Segments by Physical Reads");
+			tableNames.add("Segments by UnOptimized Reads");
+			tableNames.add("Segments by Logical Reads");
+			tableNames.add("SQL ordered by Elapsed Time");
+			tableNames.add("SQL ordered by CPU Time");
+			tableNames.add("SQL ordered by User I/O Wait Time");
+			tableNames.add("SQL ordered by Gets");
+			tableNames.add("SQL ordered by Reads");
+			tableNames.add("SQL ordered by Physical Reads (UnOptimized)");
+			tableNames.add("SQL ordered by Executions");
+			tableNames.add("SQL ordered by Parse Calls");
+			tableNames.add("SQL ordered by Sharable Memory");
+			tableNames.add("SQL ordered by Version Count");
+			tableNames.add("SQL ordered by Cluster Wait Time");
+			tableNames.add("Complete List of SQL Text");
+
+		} else {
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(config));
+				LineNumberReader lineNumberReader = new LineNumberReader(reader);
+				String line = null;
+				while ((line = lineNumberReader.readLine()) != null) {
+					matcherLine.reset(line);
+					if (matcherLine.find()) {
+						tableNames.add(line);
+
+					}
+				}
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		return tableNames;
 	}
 }
