@@ -68,6 +68,22 @@ public class WriterProcess {
 		}
 	}
 
+	protected void writeToFile(StringBuffer strBuffer, File file) {
+		try {
+			System.out.println(strBuffer);
+			file.getName();
+			if (fileNew) {
+				// printFileHeader(line);
+				setFileNew(false);
+			} else {
+				// printFileData(line, file);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void printFileHeader(String line) {
 		String str = line;
 		Pattern pattern_tr = Pattern.compile("<tr(.*?)>(.*?)</tr>");

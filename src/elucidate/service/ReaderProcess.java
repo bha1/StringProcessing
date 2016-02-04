@@ -24,6 +24,7 @@ public class ReaderProcess {
 			BufferedReader reader = new BufferedReader(new FileReader(rawFile));
 			LineNumberReader lineNumberReader = new LineNumberReader(reader);
 			String line = null;
+			StringBuffer strBuffer = new StringBuffer("");
 			List<String> tableNames = new ArrayList<>();
 			tableNames = fetchTableNames();
 			Pattern patternTableName;
@@ -46,38 +47,47 @@ public class ReaderProcess {
 				tableIsEmpty = false;
 				startTable = 0;
 				endTable = 0;
+				strBuffer.setLength(0);
 				patternTableName = Pattern.compile("(" + tableName + ")(?!</a>)");
 				matcherTableName = patternTableName.matcher("");
 				lineNumberReader = new LineNumberReader(new BufferedReader(new FileReader(rawFile)));
 				while ((line = lineNumberReader.readLine()) != null && tableEnd != true && tableIsEmpty != true) {
 					matcherTableName.reset(line);
-					if (matcherTableName.find()) {
+					if (matcherTableName.find() == true) {
+						System.out.println(matcherTableName.find());
+						System.out.println(line);
 						tableHeadingFound = true;
-
-						WriterProcess writerProcess = WriterProcess.getInstance();
-						writerProcess.createWriter(tableName);
+						strBuffer.append(line);
+						// WriterProcess writerProcess =
+						// WriterProcess.getInstance();
+						// writerProcess.createWriter(tableName);
 						while ((line = lineNumberReader.readLine()) != null && tableEnd != true) {
 							matcherTableEmpty.reset(line);
 							if (matcherTableEmpty.find() && tableStart != true) {
 								tableIsEmpty = true;
-								writerProcess.closeWriter();
+								// writerProcess.closeWriter();
 								break;
 							}
 							matcherTableStart.reset(line);
 							if (matcherTableStart.find()) {
 								tableStart = true;
 								startTable = lineNumberReader.getLineNumber();
-								writerProcess.writeToFile(line, rawFile);
+								WriterProcess writerProcess = WriterProcess.getInstance();
+								writerProcess.createWriter(tableName);
+								// writerProcess.writeToFile(line, rawFile);
+								strBuffer.append(line);
 								while ((line = lineNumberReader.readLine()) != null) {
 									matcherTableEnd.reset(line);
 									if (matcherTableEnd.find()) {
 										tableEnd = true;
 										endTable = lineNumberReader.getLineNumber();
-										writerProcess.writeToFile(line, rawFile);
+										strBuffer.append(line);
+										writerProcess.writeToFile(strBuffer, rawFile);
 										writerProcess.closeWriter();
 										break;
 									}
-									writerProcess.writeToFile(line, rawFile);
+									// writerProcess.writeToFile(line, rawFile);
+									strBuffer.append(line);
 								}
 							}
 						}
@@ -144,5 +154,20 @@ public class ReaderProcess {
 			}
 		}
 		return tableNames;
+	}
+
+	public static void main(String[] args) {
+		StringBuffer str = new StringBuffer(
+				"<table border=\"1\"><tr><th class=\"awrbg\">Service Name</th><th class=\"awrbg\">User I/O Total Wts</th><th class=\"awrbg\">User I/O Wt Time</th><th class=\"awrbg\">Concurcy Total Wts</th><th class=\"awrbg\">Concurcy Wt Time</th><th class=\"awrbg\">Admin Total Wts</th><th class=\"awrbg\">Admin Wt Time</th><th class=\"awrbg\">Network Total Wts</th><th class=\"awrbg\">Network Wt Time</th></tr>\n<tr><td class='awrc'>flxracdb</td>\n<td align=\"right\" class='awrc'>11945865</td><td align=\"right\" class='awrc'>82234</td><td align=\"right\" class='awrc'>1208992</td><td align=\"right\" class='awrc'>922</td><td align=\"right\" class='awrc'>0</td><td align=\"right\" class='awrc'>0</td><td align=\"right\" class='awrc'>5327091</td><td align=\"right\" class='awrc'>15</td></tr>\n<tr><td class='awrnc'>SYS$USERS</td>\n<td align=\"right\" class='awrnc'>1296889</td><td align=\"right\" class='awrnc'>4569</td><td align=\"right\" class='awrnc'>4995</td><td align=\"right\" class='awrnc'>4</td><td align=\"right\" class='awrnc'>0</td><td align=\"right\" class='awrnc'>0</td><td align=\"right\" class='awrnc'>13000</td><td align=\"right\" class='awrnc'>57</td></tr>\n<tr><td class='awrc'>SYS$BACKGROUND</td>\n<td align=\"right\" class='awrc'>50234</td><td align=\"right\" class='awrc'>242</td><td align=\"right\" class='awrc'>682696</td><td align=\"right\" class='awrc'>691</td><td align=\"right\" class='awrc'>0</td><td align=\"right\" class='awrc'>0</td><td align=\"right\" class='awrc'>0</td><td align=\"right\" class='awrc'>0</td></tr>\n</table>");
+		// System.out.println(str);
+		String tableName = new String("SQL ordered by Gets");
+		Pattern pat = Pattern.compile("<tr(.*?)/tr>", Pattern.DOTALL);
+		Matcher match = pat.matcher("");
+		match.reset(str);
+		while (match.find()) {
+			System.out.println(match.group(1));
+			System.out.println("***********************************************************");
+		}
+
 	}
 }
