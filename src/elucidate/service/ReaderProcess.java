@@ -54,8 +54,8 @@ public class ReaderProcess {
 				while ((line = lineNumberReader.readLine()) != null && tableEnd != true && tableIsEmpty != true) {
 					matcherTableName.reset(line);
 					if (matcherTableName.find() == true) {
-						System.out.println(matcherTableName.find());
-						System.out.println(line);
+						// System.out.println(matcherTableName.find());
+						// System.out.println(line);
 						tableHeadingFound = true;
 						strBuffer.append(line);
 						// WriterProcess writerProcess =

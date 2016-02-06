@@ -70,13 +70,14 @@ public class WriterProcess {
 
 	protected void writeToFile(StringBuffer strBuffer, File file) {
 		try {
-			System.out.println(strBuffer);
+			// System.out.println(strBuffer);
 			file.getName();
 			if (fileNew) {
-				// printFileHeader(line);
+				printFileHeader(strBuffer);
 				setFileNew(false);
+				printFileData(strBuffer, file);
 			} else {
-				// printFileData(line, file);
+				printFileData(strBuffer, file);
 			}
 
 		} catch (Exception e) {
@@ -109,6 +110,52 @@ public class WriterProcess {
 
 	private void printFileData(String line, File file) {
 		String str = line;
+		Pattern pattern_tr = Pattern.compile("<tr(.*?)>(.*?)</tr>");
+		Matcher matcher_tr = pattern_tr.matcher(str);
+		Pattern pattern_td = Pattern.compile("<td(.*?)>(.*?)</td>");
+		Matcher matcher_td;
+		boolean row_written = false;
+		String str_tr;
+		while (matcher_tr.find()) {
+			str_tr = matcher_tr.group();
+			matcher_td = pattern_td.matcher(str_tr);
+			while (matcher_td.find()) {
+				writer.print(unicodeAndQuotesProcessor(matcher_td.group(2)) + ",");
+				row_written = true;
+			}
+			if (row_written) {
+				writer.println(file.getName());
+				row_written = false;
+			}
+		}
+
+	}
+
+	private void printFileHeader(StringBuffer line) {
+		StringBuffer str = line;
+		Pattern pattern_tr = Pattern.compile("<tr(.*?)>(.*?)</tr>");
+		Matcher matcher_tr = pattern_tr.matcher(str);
+		Pattern pattern_th = Pattern.compile("<th(.*?)>(.*?)</th>");
+		Matcher matcher_th;
+		boolean row_written = false;
+		String str_tr;
+		while (matcher_tr.find()) {
+			str_tr = matcher_tr.group();
+			matcher_th = pattern_th.matcher(str_tr);
+			while (matcher_th.find()) {
+				writer.print(unicodeAndQuotesProcessor(matcher_th.group(2)) + ",");
+				row_written = true;
+			}
+		}
+		if (row_written) {
+			writer.println("File Name");
+			row_written = false;
+		}
+
+	}
+
+	private void printFileData(StringBuffer line, File file) {
+		StringBuffer str = line;
 		Pattern pattern_tr = Pattern.compile("<tr(.*?)>(.*?)</tr>");
 		Matcher matcher_tr = pattern_tr.matcher(str);
 		Pattern pattern_td = Pattern.compile("<td(.*?)>(.*?)</td>");
