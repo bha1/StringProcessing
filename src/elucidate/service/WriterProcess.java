@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +31,12 @@ public class WriterProcess {
 	public static WriterProcess getInstance() {
 		return writerProcess;
 
+	}
+
+	public Hashtable<String, StringBuffer> hashTable = new Hashtable<>();
+
+	public void setHashTable(Hashtable<String, StringBuffer> hashTable) {
+		this.hashTable = hashTable;
 	}
 
 	protected void createWriter(String tableName) {
@@ -166,7 +173,7 @@ public class WriterProcess {
 			str_tr = matcher_tr.group();
 			matcher_td = pattern_td.matcher(str_tr);
 			while (matcher_td.find()) {
-				writer.print(unicodeAndQuotesProcessor(matcher_td.group(2)) + ",");
+				writer.print(keyMapper(unicodeAndQuotesProcessor(matcher_td.group(2))) + ",");
 				row_written = true;
 			}
 			if (row_written) {
@@ -187,4 +194,13 @@ public class WriterProcess {
 		return product;
 	}
 
+	private StringBuffer keyMapper(String arg) {
+		Pattern pat = Pattern.compile("<a.*>(.*?)</a>", Pattern.DOTALL);
+		Matcher match = pat.matcher("");
+		match.reset(arg);
+		if (match.find()) {
+			return hashTable.get(unicodeAndQuotesProcessor(match.group(1)));
+		}
+		return new StringBuffer(arg);
+	}
 }

@@ -7,14 +7,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ReaderProcess {
 
+	public Hashtable<String, StringBuffer> hashTable = new Hashtable<>();
+
 	public void process(List<File> rawList) {
 		for (File file : rawList) {
+			readSQLTextList(file);
 			readTable(file);
 		}
 	}
@@ -153,16 +157,131 @@ public class ReaderProcess {
 				e.printStackTrace();
 			}
 		}
+		if (tableNames.contains("Complete List of SQL Text")) {
+			tableNames.remove("Complete List of SQL Text");
+		}
 		return tableNames;
 	}
 
+	private void readSQLTextList(File rawFile) {
+
+		Pattern patternTableName = Pattern.compile("(" + "Complete List of SQL Text" + ")(?!</a>)");
+		Matcher matcherTableName = patternTableName.matcher("");
+
+		Pattern patternTableEmpty = Pattern.compile("(?i)(no)(.*)?(data)(.*)(exists for this section of the report.)");
+		Matcher matcherTableEmpty = patternTableEmpty.matcher("");
+
+		Pattern patternTableStart = Pattern.compile("<table");
+		Matcher matcherTableStart = patternTableStart.matcher("");
+		Pattern patternTableEnd = Pattern.compile("</table");
+		Matcher matcherTableEnd = patternTableEnd.matcher("");
+		StringBuffer strBuffer = new StringBuffer("");
+		String line = null;
+		Boolean tableHeadingFound = false;
+		Boolean tableStart = false;
+		Boolean tableEnd = false;
+		Boolean tableIsEmpty = false;
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(rawFile));
+			LineNumberReader lineNumberReader = new LineNumberReader(reader);
+			while ((line = lineNumberReader.readLine()) != null && tableEnd != true && tableIsEmpty != true) {
+				matcherTableName.reset(line);
+				if (matcherTableName.find() == true) {
+					tableHeadingFound = true;
+					strBuffer.append(line);
+					while ((line = lineNumberReader.readLine()) != null && tableEnd != true) {
+						matcherTableEmpty.reset(line);
+						if (matcherTableEmpty.find() && tableStart != true) {
+							tableIsEmpty = true;
+							break;
+						}
+						matcherTableStart.reset(line);
+						if (matcherTableStart.find()) {
+							tableStart = true;
+							strBuffer.append(line);
+							while ((line = lineNumberReader.readLine()) != null) {
+								matcherTableEnd.reset(line);
+								if (matcherTableEnd.find()) {
+									tableEnd = true;
+									strBuffer.append(line);
+									break;
+								}
+								strBuffer.append(line);
+							}
+						}
+					}
+				}
+			}
+			extractHashMap(strBuffer);
+			WriterProcess writerProcess = WriterProcess.getInstance();
+			writerProcess.setHashTable(hashTable);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	private void extractHashMap(StringBuffer line) {
+		hashTable.clear();
+		StringBuffer str = line;
+		Pattern pattern_tr = Pattern.compile("<tr(.*?)>(.*?)</tr>");
+		Matcher matcher_tr = pattern_tr.matcher(str);
+		Pattern pattern_td_key = Pattern.compile("<td(.*?)><a.*?/a>(.*?)</td>");
+		Matcher matcher_td_key;
+		Pattern pattern_td = Pattern.compile("<td(.*?)>(.*?)</td>");
+		Matcher matcher_td;
+		boolean keyWritten = false;
+		boolean valueWritten = false;
+		String str_tr;
+		String key;
+		StringBuffer value = new StringBuffer("");
+		while (matcher_tr.find()) {
+			keyWritten = false;
+			valueWritten = false;
+			key = null;
+
+			str_tr = matcher_tr.group();
+			matcher_td = pattern_td.matcher(str_tr);
+			while (matcher_td.find()) {
+				if (keyWritten == false && valueWritten == false) {
+					matcher_td_key = pattern_td_key.matcher(str_tr);
+					matcher_td_key.find();
+					key = unicodeAndQuotesProcessor(matcher_td_key.group(2));
+
+					keyWritten = true;
+				} else if (keyWritten == true && valueWritten == false) {
+					value = new StringBuffer(unicodeAndQuotesProcessor(matcher_td.group(2)));
+					valueWritten = true;
+				}
+				if (keyWritten == true && valueWritten == true) {
+					hashTable.put(key, value);
+				}
+			}
+		}
+		System.out.println(hashTable);
+	}
+
+	private String unicodeAndQuotesProcessor(String arg) {
+		String product = arg;
+		if (arg.equals("&#160;")) {
+			arg = "";
+		}
+		product = ("\"" + arg + "\"");
+
+		return product;
+	}
+
 	public static void main(String[] args) {
-		StringBuffer str = new StringBuffer(
-				"<table border=\"1\"><tr><th class=\"awrbg\">Service Name</th><th class=\"awrbg\">User I/O Total Wts</th><th class=\"awrbg\">User I/O Wt Time</th><th class=\"awrbg\">Concurcy Total Wts</th><th class=\"awrbg\">Concurcy Wt Time</th><th class=\"awrbg\">Admin Total Wts</th><th class=\"awrbg\">Admin Wt Time</th><th class=\"awrbg\">Network Total Wts</th><th class=\"awrbg\">Network Wt Time</th></tr>\n<tr><td class='awrc'>flxracdb</td>\n<td align=\"right\" class='awrc'>11945865</td><td align=\"right\" class='awrc'>82234</td><td align=\"right\" class='awrc'>1208992</td><td align=\"right\" class='awrc'>922</td><td align=\"right\" class='awrc'>0</td><td align=\"right\" class='awrc'>0</td><td align=\"right\" class='awrc'>5327091</td><td align=\"right\" class='awrc'>15</td></tr>\n<tr><td class='awrnc'>SYS$USERS</td>\n<td align=\"right\" class='awrnc'>1296889</td><td align=\"right\" class='awrnc'>4569</td><td align=\"right\" class='awrnc'>4995</td><td align=\"right\" class='awrnc'>4</td><td align=\"right\" class='awrnc'>0</td><td align=\"right\" class='awrnc'>0</td><td align=\"right\" class='awrnc'>13000</td><td align=\"right\" class='awrnc'>57</td></tr>\n<tr><td class='awrc'>SYS$BACKGROUND</td>\n<td align=\"right\" class='awrc'>50234</td><td align=\"right\" class='awrc'>242</td><td align=\"right\" class='awrc'>682696</td><td align=\"right\" class='awrc'>691</td><td align=\"right\" class='awrc'>0</td><td align=\"right\" class='awrc'>0</td><td align=\"right\" class='awrc'>0</td><td align=\"right\" class='awrc'>0</td></tr>\n</table>");
+		StringBuffer str = new StringBuffer("<a class=awr\" href=\"#a54b1ppyyhv9u\">a54b1ppyyhv9u</a>");
 		// System.out.println(str);
 		String tableName = new String("SQL ordered by Gets");
-		Pattern pat = Pattern.compile("<tr(.*?)/tr>", Pattern.DOTALL);
+		Pattern pat = Pattern.compile("<a.*>(.*?)</a>", Pattern.DOTALL);
 		Matcher match = pat.matcher("");
+
 		match.reset(str);
 		while (match.find()) {
 			System.out.println(match.group(1));
