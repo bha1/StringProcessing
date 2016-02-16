@@ -262,7 +262,7 @@ public class ReaderProcess {
 				}
 			}
 		}
-		System.out.println(hashTable);
+		// System.out.println(hashTable);
 	}
 
 	private String unicodeAndQuotesProcessor(String arg) {
