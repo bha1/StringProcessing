@@ -22,4 +22,3 @@ SQL ordered by Sharable Memory
 SQL ordered by Version Count
 SQL ordered by Cluster Wait Time
 Complete List of SQL Text
-
